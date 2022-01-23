@@ -1,45 +1,25 @@
 
-def first(xs):
-    L = len(xs)
+def count_sort(ps, cs):
+    """
+    L = |ps| = |cs|
+    This runs in O(L) time
+    """
+    L = len(ps)
     buckets = [0]*L
-    for i in range(L):
-        (a,b) ,p = xs[i]
-        buckets[b] += 1
+    for val in cs:
+        buckets[val] += 1
 
-    ps = [None]*L
-    ps[0] = 0
+    pos = [None]*L
+    pos[0] = 0
     for i in range(1,L):
-        ps[i] = ps[i-1] + buckets[i-1]
+        pos[i] = pos[i-1] + buckets[i-1]
 
-    new = [None]*L
-    for (a,b),p in xs:
-        new[ps[b]] = (a,b),p
-        ps[b] += 1
-    return new
-
-
-def second(xs):
-    L = len(xs)
-    buckets = [0]*L
-    for i in range(L):
-        (a,b) ,p = xs[i]
-        buckets[a] += 1
-
-    ps = [None]*L
-    ps[0] = 0
-    for i in range(1,L):
-        ps[i] = ps[i-1] + buckets[i-1]
-
-    new = [None]*L
-    for (a,b),p in xs:
-        new[ps[a]] = (a,b),p
-        ps[a] += 1
-    return new
-
-def radix_sort(xs):
-    xs = first(xs)
-    xs = second(xs)
-    return xs
+    ps_new = [None]*L
+    for x in ps:
+        i = cs[x]
+        ps_new[pos[i]] = x
+        pos[i] += 1
+    return ps_new
 
     
     """
@@ -78,42 +58,41 @@ def suffix(s):
         else:
             cs[ps[i]] = cs[ps[i - 1]] + 1
 
-    print(cs,ps)
+    # print(cs,ps)
 
     k = 0
     while (1 << k) < N+1:
-        # for i in range(L):
-        #     ps[i] = (ps[i] - ( 1 << k) + L) % L
-
-
-        xs = []
+        """
+        k -> k + 1
+        """
         for i in range(L):
-            pair = (cs[i],cs[(i + (2**k)) % L]), i
-            xs.append(pair)
+            ps[i] = (ps[i] - ( 1 << k) + L) % L
 
-        xs = radix_sort(xs)
+        ps = count_sort(ps, cs)
+        # print(ps)
         
-        for i in range(L):
-            ps[i] = xs[i][1]
-        
-        cs[ps[0]] = 0
-    
-        high = cs[0]
+        high = 0
+        cs_new = [None]*L
+        cs_new[ps[0]] = 0
         for i in range(1,L):
-            if xs[i-1][0] == xs[i][0]:
-                cs[ps[i]] = cs[ps[i - 1]]
+            prev = cs[ps[i-1]], cs[(ps[i - 1] + (1 << k)) % L]
+            now = cs[ps[i]], cs[(ps[i] + (1 << k)) % L]
+            if (now == prev):
+                cs_new[ps[i]] = cs_new[ps[i-1]]
             else:
-                cs[ps[i]] = cs[ps[i - 1]] + 1
+                cs_new[ps[i]] = cs_new[ps[i-1]] + 1
+            high = max(high, cs_new[ps[i]])
 
-            high = max(high, cs[ps[i]])
+        cs = cs_new
+
         if high == L-1:
             break
         k += 1
 
-    for i in range(L):
-        k = ps[i]
-        print("".join(arr[k:]))
-    print(end="")
+    # for i in range(L):
+    #     k = ps[i]
+    #     print("".join(arr[k:]))
+    # print(end="")
     for i in range(L):
         print(ps[i], end = " ")
         
