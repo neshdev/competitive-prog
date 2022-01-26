@@ -124,7 +124,7 @@ def find(suffix_arr, original, query):
     # logger.info("hi {hi}")
 
     return hi - lo
-    
+
 def condition(suffix_arr, original, query, size, pos):
     N = len(query)
     # print(pos+size)
@@ -145,15 +145,37 @@ def bin_search(suffix_arr, original, query):
     return pos
     
 
+def lcp(suffix_arr, original):
+    L = len(suffix_arr)
+    rank = [None]*L
+    for i in range(0,L):
+        rank[suffix_arr[i]] = i
+
+    k = 0
+    prefix = [None]*(L-1)
+    for i in range(0,L-1):
+
+        s1 = suffix_arr[rank[i]]
+        s2 = suffix_arr[rank[i] - 1]
+
+        # print(i)
+        # print(original[s1:], original[s2:], k)
+        
+        while original[(s1 + k) % L] == original[ (s2 + k) % L]:
+            k += 1
+
+        prefix[rank[i]-1] = k
+        k = max(k-1,0)
+
+    for x in suffix_arr:
+        print(x, end=" ")
+    print()
+    for x in prefix:
+        print(x, end=" ")
 
 s = input()
 original = s + "$"
 suffix_arr = suffix(s)
-t = int(input())
-for _ in range(t):
-    query = input()
-    ans = find(suffix_arr, original, query)
-    print(ans)
-
+lcp(suffix_arr, original)
 
 
