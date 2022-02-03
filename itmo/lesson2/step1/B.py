@@ -1,3 +1,13 @@
+import sys
+
+if sys.version_info[0] < 3:
+    from io import BytesIO as stream
+else:
+    from io import StringIO as stream
+
+sys.stdin = stream(sys.stdin.read())
+input = lambda: sys.stdin.readline().rstrip('\r\n')
+
 class SegmentTree:
     def __init__(self, n, f=lambda x,y: x+y, default=0):
         size = 1
