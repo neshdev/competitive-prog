@@ -43,6 +43,7 @@ class Cons:
 def search(g: Graph, max_weight, d):
     reachable = False
     goal = g.n
+    visited = set()
     q = deque([(1,d, Cons(1))])
     while q:
         v, edge_limit, path = q.popleft()
@@ -50,11 +51,13 @@ def search(g: Graph, max_weight, d):
             reachable = True
             break
         
-        if edge_limit > 0:
-            for w, weight in g.adj_to(v):
-                if weight <= max_weight:
-                    item = w, edge_limit-1, Cons(w,path)
-                    q.append(item)
+        if v not in visited:
+            visited.add(v)
+            if edge_limit > 0:
+                for w, weight in g.adj_to(v):
+                    if weight <= max_weight:
+                        item = w, edge_limit-1, Cons(w,path)
+                        q.append(item)
     # print("final", max_weight, path, path.length(), reachable and path.length()-1 <= d)
     return reachable and path.length()-1 <= d, path
             
