@@ -40,6 +40,7 @@ def two_pointer(arr, k):
     def good():
         minimums = min(s1.min, s2.min)
         maximums = max(s1.max, s2.max)
+        # print("Actual min", minimums)
         return maximums - minimums <= k
 
     def add(x):
@@ -51,15 +52,48 @@ def two_pointer(arr, k):
                 s1.push(s2.pop())
         s1.pop()
 
+
+    from collections import deque
+    
     for r in range(N):
         add(arr[r])
-        # print("adding", s1,"|", s2)
+        
         while not good():
             remove()
             l += 1
-            # print("removing", s1,"|", s2)
+        
+        # print("intervals",(l,r))
         total += (r-l+1)
-    return total
+
+        
+
+    mq = deque()
+    max_mq = deque()
+    l = 0
+    sums = 0
+    for r in range(N):
+     
+        while mq and arr[mq[-1]] > arr[r]:
+            mq.pop()
+
+        while max_mq and arr[max_mq[-1]] < arr[r]:
+            max_mq.pop()
+
+        mq.append(r)
+        max_mq.append(r)
+        
+        while max_mq and mq and arr[max_mq[0]] - arr[mq[0]] > k:
+            l += 1
+            while mq and mq[0] < l:
+                mq.pop()
+        
+            while max_mq and max_mq[0] < l:
+                max_mq.pop()
+        # print((l,r))
+        sums += (r-l+1)
+       
+    # print(sums, total)
+    return sums
 
 ans = two_pointer(arr, k)
 print(ans)
