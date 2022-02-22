@@ -2,62 +2,84 @@ n, s = [int(x) for x in input().split()]
 arr = [int(x) for x in input().split()]
 
 
+class Stack:
+    def __init__(self, S) -> None:
+        init = [False]*(S+1)
+        init[0] = True
+        self.xs = [init]
+        self.N = S+1
+        self.idxs = []
+
+    def push(self, x):
+        N = self.N
+        arr = list(self.xs[-1])
+        for i in range(N):
+            if i - x >= 0:
+                arr[i] |= self.xs[-1][i-x]
+            else:
+                arr[i] = arr[i]
+        self.xs.append(arr)
+        self.idxs.append(x)
+
+    def pop(self):
+        self.xs.pop()
+        return self.idxs.pop()
+
+    def possible(self):
+        return self.xs[-1][-1]
+
+    def __len__(self):
+        return len(self.xs)-1
+
+    def __str__(self):
+        return str(list(zip(range(self.N),self.xs[-1])))
+
 def two_pointer(arr, s):
     l = 0
-
-    global dp
-
     N = len(arr)
     min_segment = float('inf')
 
+    s1,s2 = Stack(s), Stack(s)
+
     def add(r):
-        global dp
-        N = r-l+1
+        s2.push(arr[r])
+        # print((l,r))
+        # # print(s1)
+        # print(arr[r])
+        # print(s2)
+        # print("=====================")
 
-        dp = [[False for _ in range(s+1)] for _ in range(N+1)]
+    def remove():
+        if not s1:
+            while s2:
+                s1.push(s2.pop())
+        return s1.pop()
 
-        for y in range(N+1):
-            dp[y][0] = True
+    def evaluate():
+        """
+        using the fact
+        S = A + B
+        """
+        M = s+1
+        for i in range(0,M):
+            a = s1.xs[-1][i]
+            b = s2.xs[-1][-1-i]
+            if a and b:
+                return True
+        return False
 
-        for y,val in enumerate(arr[l:r+1],start=1):
-            # print("at y", y)
-            for x in range(1, s+1):
-                if x-val >= 0:
-                    dp[y][x] = dp[y-1][x] or dp[y-1][x-val]
-                else:
-                    dp[y][x] = dp[y-1][x] 
-
-
-    def remove(r,l):
-        global dp
-        N = r-l+1
-
-        dp = [[False for _ in range(s+1)] for _ in range(N+1)]
-
-        for y in range(N+1):
-            dp[y][0] = True
-
-        for y,val in enumerate(arr[l:r+1],start=1):
-            for x in range(1, s+1):
-                if x-val >= 0:
-                    dp[y][x] = dp[y-1][x] or dp[y-1][x-val]
-                else:
-                    dp[y][x] = dp[y-1][x] 
-
-    def good():
-        return dp[-1][-1]
 
     for r in range(N):
         add(r)
         ok = False
-        while good():
+        while evaluate():
+            remove()
             l += 1
-            remove(r,l)
             ok = True
- 
+
         if ok:
             min_segment = min(min_segment, r-l+2)
-            # print((l-1,r),(r-l+1))
+            # print((l-1,r),(r-l+2))
     return min_segment
 
 
